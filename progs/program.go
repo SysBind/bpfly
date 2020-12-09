@@ -18,15 +18,18 @@ package progs
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os/exec"
+
+	redis "github.com/go-redis/redis/v8"
 )
 
 type program struct {
-	path  string
-	redis string
-	cmd   *exec.Cmd
+	path        string
+	redis       string
+	cmd         *exec.Cmd
+	interpreter func(line string, rdb *redis.Client)
+	rdb         *redis.Client
 }
 
 type Program interface {
@@ -34,6 +37,9 @@ type Program interface {
 }
 
 func (prog program) Start() {
+	prog.rdb = redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
 	prog.cmd = exec.Command(prog.path)
 	stdout, err := prog.cmd.StdoutPipe()
 	if err != nil {
@@ -42,7 +48,7 @@ func (prog program) Start() {
 	scanner := bufio.NewScanner(stdout)
 	go func() {
 		for scanner.Scan() {
-			fmt.Println(scanner.Text())
+			prog.interpreter(scanner.Text(), prog.rdb)
 		}
 	}()
 

@@ -6,3 +6,9 @@
 - python-bcc
 - linux-headersI
 
+## Build
+
+```go build .```
+
+## Run
+```sudo ./bpfly```

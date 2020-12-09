@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .jumbotron {
+        background-color: #ef6e6f;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="exec-snoop"></div>
+    
+    <script src="elm.js"></script>
+    <script>
+      var app = Elm.ExecSnoop.init({
+        node: document.getElementById("exec-snoop")
+      });      
+    </script>
+  </body>
+</html>
