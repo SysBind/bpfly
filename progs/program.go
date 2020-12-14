@@ -64,9 +64,8 @@ func (prog program) Start() {
 			prog.interpreter(scanner.Text(), prog.rdb)
 		}
 	}()
-	log.Println("Calling cmd.Start..")
+
 	if err := prog.cmd.Start(); err != nil {
-		log.Println("error calling cmd.Start()!")
 		log.Fatal(err)
 	}
 
