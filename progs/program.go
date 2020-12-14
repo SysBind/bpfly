@@ -40,19 +40,33 @@ func (prog program) Start() {
 	prog.rdb = redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
+	log.Println("Calling exec..")
 	prog.cmd = exec.Command(prog.path)
 	stdout, err := prog.cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
 	}
+	stderr, err := prog.cmd.StderrPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err_scanner := bufio.NewScanner(stderr)
+	go func() {
+		for err_scanner.Scan() {
+			log.Printf("stderr said: %s\n", err_scanner.Text())
+			log.Printf("bpfly should run with root privileges. (or otherwise sufficient privileges to run BPF programs)")
+		}
+	}()
+
 	scanner := bufio.NewScanner(stdout)
 	go func() {
 		for scanner.Scan() {
 			prog.interpreter(scanner.Text(), prog.rdb)
 		}
 	}()
-
+	log.Println("Calling cmd.Start..")
 	if err := prog.cmd.Start(); err != nil {
+		log.Println("error calling cmd.Start()!")
 		log.Fatal(err)
 	}
 
